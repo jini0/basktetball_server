@@ -1,0 +1,7 @@
+{
+    "host": "basketball-data.cdtmdsnqpirx.us-east-1.rds.amazonaws.com",
+    "user": "admin",
+    "password": "ehdqn*#303",
+    "port": "3306",
+    "database": "basketball"
+}
