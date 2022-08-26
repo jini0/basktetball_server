@@ -22,6 +22,18 @@ const connection = mysql.createConnection({
     database: parseData.database
 })
 
+// <PROMY>
+// 1. sponser
+app.get('/sponsers', async (req, res)=>{
+    connection.query(
+        "select * from promy_sponser",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+
 // <TEAM>
 // 1. player 선수 전체
 app.get('/players', async (req, res)=>{
@@ -59,6 +71,28 @@ app.get('/player/:id', async (req, res)=>{
         }
     )
 }) 
+
+// 3. staff 전체
+app.get('/staff', async (req, res)=>{
+    connection.query(
+        "select * from team_staff",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+
+// 4. cheer 전체
+app.get('/cheer', async (req, res)=>{
+    connection.query(
+        "select * from team_cheer",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
 
 
 // 서버실행
