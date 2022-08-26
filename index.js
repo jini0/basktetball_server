@@ -34,8 +34,35 @@ app.get('/sponsers', async (req, res)=>{
     )
 })
 
+//<NEWS>
+// 1. notice 공지사항 전체
+app.get('/notices', async (req, res)=>{
+    connection.query(
+        // 게시판이 id기준으로 내림차순하여 데이터 불러오도록! order by 컬럼명 desc / cf.오름차순 asc
+        // ⚡날짜순(작성일 기준)으로 정렬하고 싶은데 -> 그게 안돼서 id를 기준으로 내림차순으로 함... <수정하기>⚡
+        "select * from news_notice order by id desc",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+// 1-1. notice 공지사항 상세보기
+app.get('/notice/:id', async (req, res)=>{
+    const params = req.params;
+    connection.query(
+        `select * from news_notice where id=${params.id}`,
+        (err, rows, fields)=>{
+            res.send(rows);
+        }
+    )
+}) 
+
+// 2. news 뉴스
+
 // <TEAM>
 // 1. player 선수 전체
+
 app.get('/players', async (req, res)=>{
     connection.query(
         "select * from team_player",
