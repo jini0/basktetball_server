@@ -22,6 +22,18 @@ const connection = mysql.createConnection({
     database: parseData.database
 })
 
+// <main페이지>
+// 1. notice 공지사항 - main 3개만 뿌리기
+app.get('/noticesmain', async (req, res)=>{
+    connection.query(
+        "select * from news_notice order by id desc limit 0,3",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+
 // <PROMY>
 // 1. sponser
 app.get('/sponsers', async (req, res)=>{
@@ -34,7 +46,7 @@ app.get('/sponsers', async (req, res)=>{
     )
 })
 
-//<NEWS>
+// <NEWS>
 // 1. notice 공지사항 전체
 app.get('/notices', async (req, res)=>{
     connection.query(
@@ -55,8 +67,21 @@ app.get('/notice/:id', async (req, res)=>{
         (err, rows, fields)=>{
             res.send(rows);
         }
+        )
+    }) 
+// 1-2. 검색
+app.get('/search/:check', async (req, res)=> {
+    const params = req.params;
+    const { check } = params;
+    connection.query(
+        `select * from news_notice where title like '%${check}%'`,
+        (err, rows, fields)=> {
+            console.log(rows);
+            res.send(rows);
+            // res.send(rows[0]);
+        }
     )
-}) 
+})
 
 // 2. news 뉴스
 
