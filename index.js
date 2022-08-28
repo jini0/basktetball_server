@@ -9,6 +9,7 @@ const fs = require('fs');
 const dataj = fs.readFileSync("./database.json");
 const parseData = JSON.parse(dataj);
 const mysql = require('mysql');
+const { resolveSoa } = require("dns");
 
 app.use(express.json());     //json형식의 데이터를 처리할수 있도록설정
 app.use(cors());    //브라우저의 다양한 사용을 위해 설정
@@ -67,20 +68,49 @@ app.get('/notice/:id', async (req, res)=>{
         (err, rows, fields)=>{
             res.send(rows);
         }
-        )
-    }) 
+    )
+}) 
 // 1-2. 검색
-app.get('/search/:check', async (req, res)=> {
+// app.get('/search/:check', async (req, res)=> {
+//     const params = req.params;
+//     const { check } = params;
+//     connection.query(
+//         `select * from news_notice where title like '%${check}%'`,
+//         (err, rows, fields)=> {
+//             console.log(rows);
+//             res.send(rows);
+//             // res.send(rows[0]);
+//         }
+//     )
+// })
+// 1-3. notice 조회수
+app.put('/view/:id', async (req, res)=>{
     const params = req.params;
-    const { check } = params;
     connection.query(
-        `select * from news_notice where title like '%${check}%'`,
-        (err, rows, fields)=> {
-            console.log(rows);
-            res.send(rows);
-            // res.send(rows[0]);
+        `update news_notice set view= view + 1 where id=${params.id}`,
+        // `update news_notice set view= view + 1`,
+        (err, rows, fields)=>{
+            if(err) {
+                console.log(err);
+            } else {
+                // console.log(rows);
+            }
         }
     )
+})
+// 1-4. notice 등록
+app.post('/registerNotice', async (req, res) => {
+    const { c_title, c_date, c_address1, c_address2, c_img1, c_img2, c_img3, c_img4, c_img5, c_desc } = req.body;
+    // console.log(req.body);
+    connection.query("INSERT INTO news_notice(`title`,`date`,`address`,`address2`,`imgsrc`,`imgsrc2`,`imgsrc3`,`imgsrc4`,`imgsrc5`,`noticedesc`) values(?,?,?,?,?,?,?,?,?,?)",
+    [c_title, c_date, c_address1, c_address2, c_img1, c_img2, c_img3, c_img4, c_img5, c_desc],
+    (err, result, fields)=>{
+        if(result){
+            console.log(result);
+            res.send("게시글 등록이 완료되었습니다.");
+        }
+       
+    })
 })
 
 // 2. news 뉴스
@@ -90,7 +120,7 @@ app.get('/search/:check', async (req, res)=> {
 
 app.get('/players', async (req, res)=>{
     connection.query(
-        "select * from team_player",
+        "select * from team_player order by name asc",
         (err, rows, fields)=>{
             res.send(rows);
             console.log(err);
