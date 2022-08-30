@@ -200,6 +200,21 @@ app.post('/registerNotice', async (req, res) => {
        
     })
 })
+// 1-5. notice 수정
+app.put('/editNotice/:id', async (req, res)=>{
+    const params = req.params;
+    const { c_title, c_date, c_address1, c_address2, c_img1, c_img2, c_img3, c_img4, c_img5, c_desc, c_view } = req.body;
+    console.log(req.body)
+    //int인거는 '따옴표'필요X / varchar이면 '따옴표' 꼭 적어주기! --> 실수,,!
+    connection.query(`UPDATE news_notice SET title='${c_title}', date='${c_date}', address='${c_address1}', address2='${c_address2}', imgsrc='${c_img1}', imgsrc2='${c_img2}', imgsrc3='${c_img3}', imgsrc4='${c_img4}', imgsrc5='${c_img5}', noticedesc='${c_desc}', view=${c_view} where id=${params.id}`,
+    (err, result, fields)=>{
+        if(err) {
+            console.log("에러발생!!");
+            console.log(err);
+        }
+        res.send(result);
+    })
+})
 // 1-6. notice 삭제
 app.delete('/delNotice/:id', async (req, res)=>{
     const params = req.params;
@@ -236,7 +251,21 @@ app.put('/viewNews/:id', async (req, res)=>{
         }
     )
 })
-// 2-3. news 삭제
+// 2-3. news 등록
+app.post('/registerNews', async (req, res) => {
+    const { c_title, c_date, c_address, c_view } = req.body;
+    // console.log(req.body);
+    connection.query("INSERT INTO news_notice(`title`,`date`,`address`,`view`) values(?,?,?,?)",
+    [c_title, c_date, c_address, c_view],
+    (err, results, fields)=>{
+        if(results){
+            console.log(results);
+            res.send("게시글 등록이 완료되었습니다.");
+        }
+       
+    })
+})
+// 2-5. news 삭제
 app.delete('/delNews/:id', async (req, res)=>{
     const params = req.params;
     console.log("게시글 삭제");
@@ -419,6 +448,79 @@ app.put('/viewEvent/:id', async (req, res)=>{
         }
     )
 })
+
+// <STORE>
+// 1. store 전체 뿌리기(신규등록순)
+app.get('/stores', async (req, res)=>{
+    connection.query(
+        "select * from store order by id desc",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+// 1-1. store 전체 뿌리기(랭킹순)
+app.get('/storesRank', async (req, res)=>{
+    connection.query(
+        "select * from store order by ranking asc",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+// 1-1. store 전체 뿌리기(낮은가격순)
+app.get('/storesLow', async (req, res)=>{
+    connection.query(
+        "select * from store order by saleprice asc",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+// 1-1. store 전체 뿌리기(높은가격순)
+app.get('/storesHigh', async (req, res)=>{
+    connection.query(
+        "select * from store order by saleprice desc",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+// // 1-1. store 전체 뿌리기(상품평많은순)
+// app.get('/storesReview', async (req, res)=>{
+//     connection.query(
+//         "select * from store order by review desc",
+//         (err, rows, fields)=>{
+//             res.send(rows);
+//             console.log(err);
+//         }
+//     )
+// })
+// 1-1. store 전체 뿌리기(판매량순)
+app.get('/storesSell', async (req, res)=>{
+    connection.query(
+        "select * from store order by sellrank asc",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+// 1-2. store 상세보기 - detail
+app.get('/store/:id', async (req, res)=>{
+    const params = req.params;
+    connection.query(
+        `select * from store where id=${params.id}`,
+        (err, rows, fields)=>{
+            res.send(rows);
+        }
+    )
+}) 
+
 
 // 서버실행
 app.listen(port, () => {
