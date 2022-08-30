@@ -237,6 +237,16 @@ app.get('/newses', async (req, res)=>{
         }
     )
 })
+// 1-1. news 뉴스 상세보기
+app.get('/news/:id', async (req, res)=>{
+    const params = req.params;
+    connection.query(
+        `select * from news_news where id=${params.id}`,
+        (err, rows, fields)=>{
+            res.send(rows);
+        }
+    )
+}) 
 // 2-2. news 조회수
 app.put('/viewNews/:id', async (req, res)=>{
     const params = req.params;
@@ -255,7 +265,7 @@ app.put('/viewNews/:id', async (req, res)=>{
 app.post('/registerNews', async (req, res) => {
     const { c_title, c_date, c_address, c_view } = req.body;
     // console.log(req.body);
-    connection.query("INSERT INTO news_notice(`title`,`date`,`address`,`view`) values(?,?,?,?)",
+    connection.query("INSERT INTO news_news(`title`,`date`,`address`,`view`) values(?,?,?,?)",
     [c_title, c_date, c_address, c_view],
     (err, results, fields)=>{
         if(results){
@@ -263,6 +273,19 @@ app.post('/registerNews', async (req, res) => {
             res.send("게시글 등록이 완료되었습니다.");
         }
        
+    })
+})
+// 2-4. news 수정
+app.put('/editNews/:id', async (req, res)=>{
+    const params = req.params;
+    const { c_title, c_date, c_address, c_view } = req.body;
+    connection.query(`UPDATE news_news SET title='${c_title}', date='${c_date}', address='${c_address}', view=${c_view} where id=${params.id}`,
+    (err, result, fields)=>{
+        if(err) {
+            console.log("에러발생!!");
+            console.log(err);
+        }
+        res.send(result);
     })
 })
 // 2-5. news 삭제
@@ -321,7 +344,7 @@ app.get('/cheer', async (req, res)=>{
 })
 
 // <Fan>
-// 2. Youtube 유튜브 전체(아이디로..!)
+// 1. Youtube 유튜브 전체(아이디로..!)
 app.get('/youtubes', async (req, res)=>{
     connection.query(
         "select * from fan_youtube order by id desc",
@@ -331,7 +354,7 @@ app.get('/youtubes', async (req, res)=>{
         }
     )
 })
-// 2-1. Youtube 유튜브 클릭전 - 제일 최근 영상 재생
+// 1-1. Youtube 유튜브 클릭전 - 제일 최근 영상 재생
 app.get('/youtubeLatest', async (req, res)=>{
     connection.query(
         "select * from fan_youtube order by id desc limit 0,1",
@@ -341,7 +364,7 @@ app.get('/youtubeLatest', async (req, res)=>{
         }
     )
 })
-// 2-2. Youtube 유튜브 클릭시 - 상세
+// 1-2. Youtube 유튜브 클릭시 - 상세
 app.get('/youtube/:id', async (req, res)=>{
     const params = req.params;
     connection.query(
@@ -351,7 +374,7 @@ app.get('/youtube/:id', async (req, res)=>{
         }
     )
 }) 
-// 2-3. Youtube 조회수
+// 1-3. Youtube 조회수
 app.put('/viewYoutube/:id', async (req, res)=>{
     const params = req.params;
     connection.query(
@@ -367,7 +390,7 @@ app.put('/viewYoutube/:id', async (req, res)=>{
 })
 
 
-// 1. Photo 사진 전체
+// 2. Photo 사진 전체
 app.get('/photos', async (req, res)=>{
     connection.query(
         "select * from fan_photo order by id desc",
@@ -377,7 +400,7 @@ app.get('/photos', async (req, res)=>{
         }
     )
 })
-// 1-1. photo 상세보기 - detail
+// 2-1. photo 상세보기 - detail
 app.get('/photo/:id', async (req, res)=>{
     const params = req.params;
     connection.query(
@@ -387,7 +410,7 @@ app.get('/photo/:id', async (req, res)=>{
         }
     )
 }) 
-// 1-1. photo 조회수
+// 2-2. photo 조회수
 app.put('/viewPhoto/:id', async (req, res)=>{
     const params = req.params;
     connection.query(
@@ -401,6 +424,42 @@ app.put('/viewPhoto/:id', async (req, res)=>{
             }
         }
     )
+})
+// 2-3. photo 등록
+app.post('/registerPhoto', async (req, res) => {
+    const { c_title, c_date, c_sort, c_img, c_img1, c_img2, c_img3, c_img4, c_view } = req.body;
+    connection.query("INSERT INTO fan_photo(`title`,`date`,`sort`,`imgsrc`,`imgsrc1`,`imgsrc2`,`imgsrc3`,`imgsrc4`,`view`) values(?,?,?,?,?,?,?,?,?)",
+    [c_title, c_date, c_sort, c_img, c_img1, c_img2, c_img3, c_img4, c_view],
+    (err, results, fields)=>{
+        if(results){
+            console.log(results);
+            res.send("사진이 등록이 완료되었습니다.");
+        }
+       
+    })
+})
+// 2-4. photo 수정
+app.put('/editPhoto/:id', async (req, res)=>{
+    const params = req.params;
+    const { c_title, c_date, c_sort, c_img, c_img1, c_img2, c_img3, c_img4, c_view } = req.body;
+    connection.query(`UPDATE fan_photo SET title='${c_title}', date='${c_date}', sort='${c_sort}', imgsrc='${c_img}', imgsrc1='${c_img1}', imgsrc2='${c_img2}', imgsrc3='${c_img3}', imgsrc4='${c_img4}', view=${c_view} where id=${params.id}`,
+    (err, result, fields)=>{
+        if(err) {
+            console.log("에러발생!!");
+            console.log(err);
+        }
+        res.send(result);
+    })
+})
+// 2-5. photo 삭제
+app.delete('/delPhoto/:id', async (req, res)=>{
+    const params = req.params;
+    console.log("사진 삭제");
+    connection.query(`delete from fan_photo where id = ${params.id}`,
+    (err, rows, fields) => {
+        res.send(rows);
+        console.log(err);
+    })    
 })
 
 // <Event>
