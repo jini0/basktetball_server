@@ -343,6 +343,11 @@ app.get('/cheer', async (req, res)=>{
     )
 })
 
+// <GAME>
+// 1. 게임 일정 등록
+
+
+
 // <Fan>
 // 1. Youtube 유튜브 전체(아이디로..!)
 app.get('/youtubes', async (req, res)=>{
@@ -579,6 +584,18 @@ app.get('/store/:id', async (req, res)=>{
         }
     )
 }) 
+// 1-3. store - prouct 등록하기
+app.post('/registerProduct', async (req, res) => {
+    const { c_name, c_span, c_price, c_saleprice, c_discountper, c_seller, c_img, c_desc, c_desc2, c_sort, c_ranking, c_review, c_sellrank, c_delivery } = req.body;
+    connection.query("INSERT INTO store(`name`,`span`,`price`,`saleprice`,`discountper`,`seller`,`imgsrc`,`imgdesc`,`imgdesc2`,`sort`,`ranking`,`review`,`sellrank`,`delivery`) values(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    [c_name, c_span, c_price, c_saleprice, c_discountper, c_seller, c_img, c_desc, c_desc2, c_sort, c_ranking, c_review, c_sellrank, c_delivery],
+    (err, results, fields)=>{
+        if(results){
+            console.log(results);
+            res.send("상품 등록이 완료되었습니다.");
+        }    
+    })
+})
 
 
 // 서버실행
