@@ -43,7 +43,7 @@ app.post("/join", async (req, res)=>{
                 [userId, myPass, userName, userBirthY, userBirthM, userBirthD, userGender, userPhone, userPhone2, userPhone3, userMail, userAdd, userAdd_detail],
                 (err, result, fields) => {
                     console.log(result);
-                    // console.log(err);
+                    console.log(err);
                     res.send("등록되었습니다.")
                 }
                 )
