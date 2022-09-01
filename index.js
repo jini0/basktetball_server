@@ -26,34 +26,42 @@ const connection = mysql.createConnection({
     database: parseData.database
 })
 
-// // 회원가입
-// app.post("/join", async (req, res)=>{
-//     let myPlanintextPass = req.body.userpass;       //body에 userpass라는 애가 있으면 담아줘!
-//     let myPass = "";        //password를 green1234로 했음  -->  req.body.userpass가 담아둘거임  --> 얘를 암호화 할거임 --> 암호화한 애를 담아주기 위해 myPass 빈변수를 만들어줌
-//     if(myPlanintextPass != '' && myPlanintextPass != undefined){
-//         //빈 값과 undefined가 아닐때,
-//         //1. 💗https://www.npmjs.com/package/bcrypt 에서 긁어오고 변수만 제대로 고쳐주기!!!!(Technique 1 (generate a salt and hash on separate function calls): 꺼 긁어와서)💗
-//         bcrypt.genSalt(saltRounds, function(err, salt) {
-//             bcrypt.hash(myPlanintextPass, salt, function(err, hash) {
-//                 // Store hash in your password DB.
-//                 myPass = hash;
-//                 console.log(myPass);
+// 회원가입
+app.post("/join", async (req, res)=>{
+    let myPlanintextPass = req.body.userPass;      
+    let myPass = "";     
+    if(myPlanintextPass != '' && myPlanintextPass != undefined){     //빈 값과 undefined가 아닐때,
+        //1. 💗https://www.npmjs.com/package/bcrypt 에서 긁어오고 변수만 제대로 고쳐주기!!!!(Technique 1 (generate a salt and hash on separate function calls): 꺼 긁어와서)💗
+        bcrypt.genSalt(saltRounds, function(err, salt) {
+            bcrypt.hash(myPlanintextPass, salt, function(err, hash) {
+                // Store hash in your password DB.
+                myPass = hash;
+                console.log(myPass);
+                //2. 쿼리 작성
+                const {userId, userName, userBirthY, userBirthM, userBirthD, userGender, userPhone, userPhone2, userPhone3, userMail, userAdd, userAdd_detail} = req.body;              //regdate등록일만 바로 넣어줄거임  --> now()함수 사용하고 DATE_FORMAT을 이용해서 년/월/일만 나오게(시간은 빼고!):'%Y-%m-%d'                    
+                connection.query("insert into member(userid, password, name, birthY, birthM, birthD, gender, phone, phone2, phone3, mail, add, adddetail, regdate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,DATE_FORMAT(now(),'%Y-%m-%d'))",
+                [userId, myPass, userName, userBirthY, userBirthM, userBirthD, userGender, userPhone, userPhone2, userPhone3, userMail, userAdd, userAdd_detail],
+                (err, result, fields) => {
+                    console.log(result)
+                    console.log(err)
+                    res.send("등록되었습니다.")
+                }
+                )
+            });
+        });
+    }
+})
 
-//                 //2. 쿼리 작성
-//                 const {username, userphone, userorg, usermail} = req.body;
-//                 //connection.query(쿼리문, 쿼리문에 들어갈 값, 콜백함수)   -->쿼리문인자, 배열, 콜백함수                                      //regdate등록일만 바로 넣어줄거임  --> now()함수 사용하고 DATE_FORMAT을 이용해서 년/월/일만 나오게(시간은 빼고!):'%Y-%m-%d'
-//                 connection.query("insert into customer_members(username, userpass, userphone, userorg, usermail, regdate) values(?,?,?,?,?,DATE_FORMAT(now(),'%Y-%m-%d'))",
-//                 [username, myPass, userphone, userorg, usermail],
-//                 (err, result, fields) => {
-//                     console.log(result)
-//                     console.log(err)
-//                     res.send("등록되었습니다.")
-//                 }
-//                 )
-//             });
-//         });
-//     }
-// })
+// 회원가입 - id 중복 확인
+app.get('/idCheck', async (req,res)=>{
+    connection.query(
+        "select userid from member",
+        (err, rows, fields)=> {
+            res.send(rows);
+            // console.log(err);
+        }
+    )
+})
 
 // <main페이지>
 // 1. notice 공지사항 - main 3개만 뿌리기
