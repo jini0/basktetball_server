@@ -39,7 +39,7 @@ app.post("/join", async (req, res)=>{
                 console.log(myPass);
                 //2. 쿼리 작성
                 const {userId, userName, userBirthY, userBirthM, userBirthD, userGender, userPhone, userPhone2, userPhone3, userMail, userAdd, userAdd_detail} = req.body;              //regdate등록일만 바로 넣어줄거임  --> now()함수 사용하고 DATE_FORMAT을 이용해서 년/월/일만 나오게(시간은 빼고!):'%Y-%m-%d'                    
-                connection.query("insert into member(userid, password, name, birthY, birthM, birthD, gender, phone, phone2, phone3, mail, add, adddetail, regdate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,DATE_FORMAT(now(),'%Y-%m-%d'))",
+                connection.query("insert into member(userid, password, name, birthY, birthM, birthD, gender, phone, phone2, phone3, mail, add1, add2, regdate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,DATE_FORMAT(now(),'%Y-%m-%d'))",
                 [userId, myPass, userName, userBirthY, userBirthM, userBirthD, userGender, userPhone, userPhone2, userPhone3, userMail, userAdd, userAdd_detail],
                 (err, result, fields) => {
                     console.log(result)
@@ -51,6 +51,25 @@ app.post("/join", async (req, res)=>{
         });
     }
 })
+//1. 적고나서, postman 열어서 테스트해보기  --> POST    http://localhost:8001/join 주소 입력
+//Body - row에서 - JSON 클릭!!!!
+//{
+//     "userPass":"pink1234"        
+// }
+//이렇게 입력해줌 node index.js로 서버 돌려주고, 위의 값을 포스트맨에서 send 해주면
+//터미널에 $2b$10$yqFyBvW/4iPvBJj5bxBideNicGpBFKIesx.BLPOqAXLOVWKI2TqIi   이런식으로 뜬다  --> pink1234가 암호화된거!
+//2. 적고나서, postman으로 테스트  (위에와 주소랑 Body-row -JSON는 같음)
+// {
+//     "userId":"pink",
+//     "userName":"핑크",
+//     "userPass":"pink1234",
+//     "userGender":"남자",
+//     "userPhone":"010",
+//     "userPhone2":"1234",
+//     "userPhone3":"1234",
+//     "userMail":"abc@naver.com"
+// }            //등록일은 바로 지정해줘서 이렇게만! 배열에 들어갈 애들만 넣어주기(null이 아닌애들만)
+//send보내면, 밑에 등록되었습니다. 가 뜨고 / mysql workbench에서 member table에서 값들이 잘 추가입력된 걸 볼 수 있다!
 
 // 회원가입 - id 중복 확인
 app.get('/idCheck', async (req,res)=>{
