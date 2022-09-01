@@ -26,7 +26,7 @@ const connection = mysql.createConnection({
     database: parseData.database
 })
 
-// 회원가입
+// 회원가입 요청
 app.post("/join", async (req, res)=>{
     let myPlanintextPass = req.body.userPass;      
     let myPass = "";     
@@ -77,10 +77,57 @@ app.get('/idCheck', async (req,res)=>{
         "select userid from member",
         (err, rows, fields)=> {
             res.send(rows);
-            // console.log(err);
+            console.log(err);
         }
     )
 })
+
+// 로그인 요청
+app.post('/login', async (req, res)=> {
+    // - 2개만 받아올거임 id인 userId와 비밀번호인 userPass
+    // ✔userId값에 일치하는 데이터가 있는지 select문 1234 -> #dfwew2rE 이런식으로 이상하게 암호화돼서
+    //   입력한 userPass를 암호화 해서 쿼리 결과의 패스워드와 일치하는지를 체크
+    // - 사용자가 회원가입시 1111로 비밀번호를 가입했는데 mysql에 값이 담길 때는 암호화되어서 $2b$10$wzNRbu9ndmQnw2CZ5H2HFuD.vMDLqnRAmrpE2sUo7SQFHPOf2TKn6 이런식으로 담기니까
+    //   사용자가 로그인시, 입력한 비밀번호인 1111을 다시 암호화하고 mysql에 담긴 암호화된 비밀번호와 두개가 일치하는지 비교하게 할거임!!!
+    const { userId, userPass } = req.body;
+    connection.query(`select * from member where userid = '${userId}'`,
+        (err, rows, fileds)=>{
+            if(rows != undefined) {     //결과가 있을 때
+                if(rows[0] == undefined) {
+                    // res.send(null)
+                    res.send("실패1");
+                    // console.log(err);
+                } else {
+                    // Load hash from your password DB.
+                    //https://www.npmjs.com/package/bcrypt 에서 긁어오기 (To check a password: 여기서!!! 맨 위의 주석빼고 위에 두줄만 적어주기)
+                    bcrypt.compare(userPass, rows[0].password, function(err, result) {  //rows[0].password : hash자리  --> 암호화한 비번
+                        // result == true
+                        if(result == true) {
+                            res.send(rows[0])
+                        } else {
+                            console.log(err);
+                            res.send('실패2')
+                        }
+                    });
+                }
+            } else {
+                res.send('실패')
+            }
+        }
+    )
+})
+// 로그인 - 로그인시 해당 아이디가 있는지 체크
+app.get('/getId/:id', async (req,res)=>{
+    const params = req.params;
+    const { id } = params;
+    connection.query(
+        `select userid from member where userid='${id}'`,
+        (err, rows, fields)=>{
+            res.send(rows);
+        }
+    )
+})
+
 
 // <main페이지>
 // 1. notice 공지사항 - main 3개만 뿌리기
