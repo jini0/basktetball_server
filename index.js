@@ -5,14 +5,17 @@ const express = require("express");    //express로 만들거니까!
 const cors = require("cors");
 const app = express();
 const port =  process.env.PORT || 8001;
-const fs = require('fs');
+const fs = require('fs');   //파일을 읽어오도록 해준다.
 const dataj = fs.readFileSync("./database.json");
-const parseData = JSON.parse(dataj);
+const parseData = JSON.parse(dataj);    //json데이터를 객체 형태로 변경
 const mysql = require('mysql');
-const { resolveSoa } = require("dns");
+// const { resolveSoa } = require("dns");
+const bcrypt = require('bcrypt');   //비밀번호 암호화       //6. npm install bcrypt
+const saltRounds = 10;              //10번 암호화 할거다!(기회)
 
-app.use(express.json());     //json형식의 데이터를 처리할수 있도록설정
-app.use(cors());    //브라우저의 다양한 사용을 위해 설정
+//use는 앱에 대한 설정
+app.use(express.json());     //json형식의 데이터를 처리할수 있도록 설정(json형식으로 정보를 전달하겠다.)
+app.use(cors());    //브라우저의 다양한 사용을 위해 설정 /모든 브라우저에서 요청을 할 수 있게 해줌 / 브라우저의 CORS이슈를 막기 위해 사용하는 코드
 
 //데이터베이스 연결
 const connection = mysql.createConnection({
@@ -22,6 +25,35 @@ const connection = mysql.createConnection({
     port:parseData.port,
     database: parseData.database
 })
+
+// // 회원가입
+// app.post("/join", async (req, res)=>{
+//     let myPlanintextPass = req.body.userpass;       //body에 userpass라는 애가 있으면 담아줘!
+//     let myPass = "";        //password를 green1234로 했음  -->  req.body.userpass가 담아둘거임  --> 얘를 암호화 할거임 --> 암호화한 애를 담아주기 위해 myPass 빈변수를 만들어줌
+//     if(myPlanintextPass != '' && myPlanintextPass != undefined){
+//         //빈 값과 undefined가 아닐때,
+//         //1. 💗https://www.npmjs.com/package/bcrypt 에서 긁어오고 변수만 제대로 고쳐주기!!!!(Technique 1 (generate a salt and hash on separate function calls): 꺼 긁어와서)💗
+//         bcrypt.genSalt(saltRounds, function(err, salt) {
+//             bcrypt.hash(myPlanintextPass, salt, function(err, hash) {
+//                 // Store hash in your password DB.
+//                 myPass = hash;
+//                 console.log(myPass);
+
+//                 //2. 쿼리 작성
+//                 const {username, userphone, userorg, usermail} = req.body;
+//                 //connection.query(쿼리문, 쿼리문에 들어갈 값, 콜백함수)   -->쿼리문인자, 배열, 콜백함수                                      //regdate등록일만 바로 넣어줄거임  --> now()함수 사용하고 DATE_FORMAT을 이용해서 년/월/일만 나오게(시간은 빼고!):'%Y-%m-%d'
+//                 connection.query("insert into customer_members(username, userpass, userphone, userorg, usermail, regdate) values(?,?,?,?,?,DATE_FORMAT(now(),'%Y-%m-%d'))",
+//                 [username, myPass, userphone, userorg, usermail],
+//                 (err, result, fields) => {
+//                     console.log(result)
+//                     console.log(err)
+//                     res.send("등록되었습니다.")
+//                 }
+//                 )
+//             });
+//         });
+//     }
+// })
 
 // <main페이지>
 // 1. notice 공지사항 - main 3개만 뿌리기
