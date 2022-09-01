@@ -42,8 +42,8 @@ app.post("/join", async (req, res)=>{
                 connection.query("insert into member(userid, password, name, birthY, birthM, birthD, gender, phone, phone2, phone3, mail, add1, add2, regdate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,DATE_FORMAT(now(),'%Y-%m-%d'))",
                 [userId, myPass, userName, userBirthY, userBirthM, userBirthD, userGender, userPhone, userPhone2, userPhone3, userMail, userAdd, userAdd_detail],
                 (err, result, fields) => {
-                    console.log(result)
-                    console.log(err)
+                    console.log(result);
+                    // console.log(err);
                     res.send("등록되었습니다.")
                 }
                 )
