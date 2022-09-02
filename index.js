@@ -38,6 +38,7 @@ app.post("/join", async (req, res)=>{
                 myPass = hash;
                 console.log(myPass);
                 //2. 쿼리 작성
+                // phone 번호를 int로 하면 010을 입력했을때, 숫자라서 0이 사라지고 10만 자꾸 남음! phone2/phone3도 마찬가지!! ---> varchar로 해주자!!✨
                 const {userId, userName, userBirthY, userBirthM, userBirthD, userGender, userPhone, userPhone2, userPhone3, userMail, userAdd, userAdd_detail} = req.body;              //regdate등록일만 바로 넣어줄거임  --> now()함수 사용하고 DATE_FORMAT을 이용해서 년/월/일만 나오게(시간은 빼고!):'%Y-%m-%d'                    
                 connection.query("insert into member(userid, password, name, birthY, birthM, birthD, gender, phone, phone2, phone3, mail, add1, add2, regdate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,DATE_FORMAT(now(),'%Y-%m-%d'))",
                 [userId, myPass, userName, userBirthY, userBirthM, userBirthD, userGender, userPhone, userPhone2, userPhone3, userMail, userAdd, userAdd_detail],
@@ -127,6 +128,56 @@ app.get('/getId/:id', async (req,res)=>{
         }
     )
 })
+
+// <장바구니>
+// 장바구니
+app.get('/cart', async (req, res)=>{
+    const params = req.params;
+    connection.query(
+        `select * from cart`,
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+            // console.log(fields);
+        }
+    )
+})
+
+// 장바구니에 추가
+app.post('/addCart', async (req,res)=>{
+    const body = req.body;
+    const { c_userid, c_name, c_span, c_saleprice, c_amount, c_img, c_select } = body;
+    connection.query(
+        `select * from cart where userid='${c_userid}' and name='${c_name}'`,
+        (err, rows, fields)=>{
+            if(rows.length == 1) {
+                res.send('있음');
+            } else {
+                connection.query(
+                    "insert into cart(userid, name, span, saleprice, amount, imgsrc, select) values(?,?,?,?,?,?,?)",
+                    [c_userid, c_name, c_span, c_saleprice, c_amount, c_img],
+                    (err, rows, fields)=>{
+                        res.send(rows);
+                    }
+                )
+            }
+        }
+    )
+})
+
+
+// 장바구니 삭제
+app.delete('/delCart/:id', async (req,res)=>{
+    const params = req.params;
+    const { id } = params;
+    connection.query(
+        `delete from cart where id=${id}`,
+        (err, rows, fields)=>{
+            res.send(rows);
+        }
+    )
+})
+
 
 
 // <main페이지>
