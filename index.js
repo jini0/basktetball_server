@@ -131,10 +131,11 @@ app.get('/getId/:id', async (req,res)=>{
 
 // <장바구니>
 // 장바구니
-app.get('/cart', async (req, res)=>{
+app.get('/cart/:idid', async (req, res)=>{
     const params = req.params;
+    const { idid } = params;
     connection.query(
-        `select * from cart`,
+        `select * from cart where userid='${idid}'`,
         (err, rows, fields)=>{
             res.send(rows);
             console.log(err);
@@ -143,10 +144,24 @@ app.get('/cart', async (req, res)=>{
     )
 })
 
+// 장바구니 총 금액 구하기
+app.get('/total/:idid', async (req,res)=>{
+    const params = req.params;
+    const { idid } = params;
+    connection.query(
+        `select sum(saleprice*amount) as total from cart where user_id='${idid}'`,
+        (err, rows, fields)=>{
+            res.send(rows[0]);
+        }
+    )
+})
+
+
 // 장바구니에 추가
-app.post('/addCart', async (req,res)=>{
+app.put('/addCart', async (req,res)=>{
     const body = req.body;
     const { c_userid, c_name, c_span, c_saleprice, c_amount, c_img, c_select } = body;
+    const total = Number(c_amount) * Number(c_saleprice);
     connection.query(
         `select * from cart where userid='${c_userid}' and name='${c_name}'`,
         (err, rows, fields)=>{
@@ -155,7 +170,7 @@ app.post('/addCart', async (req,res)=>{
             } else {
                 connection.query(
                     "insert into cart(userid, name, span, saleprice, amount, imgsrc, select) values(?,?,?,?,?,?,?)",
-                    [c_userid, c_name, c_span, c_saleprice, c_amount, c_img],
+                    [c_userid, c_name, c_span, c_saleprice, c_amount, c_img, c_select],
                     (err, rows, fields)=>{
                         res.send(rows);
                     }
@@ -170,6 +185,7 @@ app.post('/addCart', async (req,res)=>{
 app.delete('/delCart/:id', async (req,res)=>{
     const params = req.params;
     const { id } = params;
+    console.log("카트 삭제");
     connection.query(
         `delete from cart where id=${id}`,
         (err, rows, fields)=>{
@@ -502,7 +518,26 @@ app.get('/cheer', async (req, res)=>{
 
 // <GAME>
 // 1. 게임 일정 등록
-
+app.get('/calendars', async (req, res)=>{
+    connection.query(
+        "select * from game_calendar",
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+// // 1. 게임 일정 등록
+// app.get('/calendars/:date', async (req, res)=>{
+//     const params = req.params;
+//     connection.query(
+//         `select * from game_calendar where date=${params.date}`,
+//         (err, rows, fields)=>{
+//             res.send(rows);
+//             console.log(err);
+//         }
+//     )
+// })
 
 
 // <Fan>
@@ -753,7 +788,16 @@ app.post('/registerProduct', async (req, res) => {
         }    
     })
 })
-
+// 1-5. store - prouct 삭제
+app.delete('/delProduct/:id', async (req, res)=>{
+    const params = req.params;
+    // console.log("상품 삭제");
+    connection.query(`delete from store where id = ${params.id}`,
+    (err, rows, fields) => {
+        res.send(rows);
+        console.log(err);
+    })    
+})
 
 // 서버실행
 app.listen(port, () => {
