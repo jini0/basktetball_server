@@ -229,31 +229,32 @@ app.get('/getheart/:userid', async (req, res)=>{
 // })
 
 // <상품리뷰>
-// 리뷰 뿌리기 
-app.get('/review/:itemid', async (req, res)=>{
-    const params = req.params;
-    const { itemid } = params;
+// 리뷰 뿌리기 (제품 상세페이지에서 해당 제품의 리뷰들을 출력하기)
+app.get("/review/:product", async (req,res)=>{
+    // const params = req.params;
+    const {product} = req.params;
     connection.query(
-        `select * from review order by id desc where itemid=${itemid}`,
-        (err, rows, fields)=>{
-            res.send(rows);
-            console.log(err);
-        }
-    )
+        `select * from review where name = '${product}' order by id desc`,
+    (err,rows,fields)=>{
+        res.send(rows);
+        console.log(err);
+    })
 })
+
 // 리뷰 작성하기
-app.post('/addReview/:idid', async (req, res)=>{
-    const params = req.params;
-    const { idid } = params;
-    const { c_userid, c_itemid, c_reviewdesc, c_reviewimg, c_reviewstar, c_name, c_reviewrank } = req.body;
+app.post('/addReview', async (req, res)=>{
+    const { userid, name, reviewtitle, reviewdesc, reviewimg, reviewstar, date } = req.body;
+    console.log(req.body);
     connection.query(
-        `INSERT INTO review('userid', 'itemid', 'reviewdesc', 'reviewimg', 'reviewstar', 'name', 'reviewrank') values(?,?,?,?,?,?,?) where userid='${idid}'`,
-        [c_userid, c_itemid, c_reviewdesc, c_reviewimg, c_reviewstar, c_name, c_reviewrank],
-        (err, rows, fileds)=>{
-            res.send(rows);
-            console.log('리뷰작성!!!!')
-            console.log(err);
-        }
+        connection.query(
+            "insert into review(`userid`,`name`,`reviewtitle`,`reviewdesc`,`reviewimg`,`reviewstar`,`date`) values(?,?,?,?,?,?,?)",
+            [userid, name, reviewtitle, reviewdesc, reviewimg, reviewstar, date],
+            (err, rows, fileds)=>{
+                res.send(rows);
+                console.log('리뷰작성!!!!')
+                console.log(err);
+            }
+        )
     )
 })
 
