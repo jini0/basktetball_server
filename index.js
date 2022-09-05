@@ -189,13 +189,73 @@ app.delete('/delCart/:id', async (req,res)=>{
     const { id } = params;
     console.log("카트 삭제");
     connection.query(
-        `delete from cart where id=${id}`,
+        `delete from cart where id='${id}'`,
         (err, rows, fields)=>{
             res.send(rows);
         }
     )
 })
 
+// - 찜하기
+// 하트 가져오기
+app.get('/getheart/:userid', async (req, res)=>{
+    const userid = req.params.userid;
+    connection.query(
+        `select * from likes where userid = '${userid}';`,
+        (err, rows, fileds) => {
+            if(err) res.send('no heart yet');
+            res.send(rows);
+        }
+    )
+})
+// // 하트 넣기
+// app.post('/addheart', async (req)=>{
+//     const { userId, projectTitle, projectImg, releaseDate, deadLine, projectPrice, projectAchieve, sellerId, projectId} = req.body;
+//     connection.query(
+//         `insert into likes (userId, projectTitle, projectImg, releaseDate, deadLine, projectPrice, projectAchieve, sellerId, projectId) value(?,?,?,?,?,?,?,?,?)`,
+//         [ userId, projectTitle, projectImg, releaseDate, deadLine, projectPrice, projectAchieve, sellerId, projectId ],
+//         (err) => {
+//             if(err) console.log(err);
+//         }
+//     )
+// })
+// // 하트 삭제
+// app.delete('/deleteheart/:title', async (req, res)=>{
+//     const title = req.params.title;
+//     connection.query(`delete from likes where projectTitle='${title}'`,
+//     (err)=>{
+//         if(err) console.log(err);
+//     })
+// })
+
+// <상품리뷰>
+// 리뷰 뿌리기 
+app.get('/review/:itemid', async (req, res)=>{
+    const params = req.params;
+    const { itemid } = params;
+    connection.query(
+        `select * from review order by id desc where itemid=${itemid}`,
+        (err, rows, fields)=>{
+            res.send(rows);
+            console.log(err);
+        }
+    )
+})
+// 리뷰 작성하기
+app.post('/addReview/:idid', async (req, res)=>{
+    const params = req.params;
+    const { idid } = params;
+    const { c_userid, c_itemid, c_reviewdesc, c_reviewimg, c_reviewstar, c_name, c_reviewrank } = req.body;
+    connection.query(
+        `INSERT INTO review('userid', 'itemid', 'reviewdesc', 'reviewimg', 'reviewstar', 'name', 'reviewrank') values(?,?,?,?,?,?,?) where userid='${idid}'`,
+        [c_userid, c_itemid, c_reviewdesc, c_reviewimg, c_reviewstar, c_name, c_reviewrank],
+        (err, rows, fileds)=>{
+            res.send(rows);
+            console.log('리뷰작성!!!!')
+            console.log(err);
+        }
+    )
+})
 
 
 // <main페이지>
@@ -781,13 +841,26 @@ app.get('/store/:id', async (req, res)=>{
 // 1-3. store - prouct 등록하기
 app.post('/registerProduct', async (req, res) => {
     const { c_name, c_span, c_price, c_saleprice, c_discountper, c_seller, c_img, c_desc, c_desc2, c_sort, c_ranking, c_review, c_sellrank, c_delivery } = req.body;
-    connection.query("INSERT INTO store(`name`,`span`,`price`,`saleprice`,`discountper`,`seller`,`imgsrc`,`imgdesc`,`imgdesc2`,`sort`,`ranking`,`review`,`sellrank`,`delivery`) values(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    connection.query("INSERT INTO store(`name`,`span`,`price`,`saleprice`,`discountper`,`seller`,`imgsrc`,`imgdesc`,`imgdesc2`,`sortcategory`,`ranking`,`review`,`sellrank`,`delivery`) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
     [c_name, c_span, c_price, c_saleprice, c_discountper, c_seller, c_img, c_desc, c_desc2, c_sort, c_ranking, c_review, c_sellrank, c_delivery],
     (err, results, fields)=>{
         if(results){
             console.log(results);
             res.send("상품 등록이 완료되었습니다.");
         }    
+    })
+})
+// 1-4. store - prouct 수정
+app.put('/editProduct/:id', async (req, res)=>{
+    const params = req.params;
+    const { c_name, c_span, c_price, c_saleprice, c_discountper, c_seller, c_img, c_desc, c_desc2, c_sort, c_ranking, c_review, c_sellrank, c_delivery } = req.body;
+    connection.query(`UPDATE store SET name='${c_name}', span='${c_span}', price=${c_price}, saleprice=${c_saleprice}, discountper='${c_discountper}', seller='${c_seller}', sortcategory='${c_sort}', imgsrc='${c_img}', imgdesc='${c_desc}', imgdesc2='${c_desc2}', ranking='${c_ranking}', review='${c_review}', sellrank='${c_sellrank}', delivery='${c_delivery}'  where id=${params.id}`,
+    (err, result, fields)=>{
+        if(err) {
+            console.log("에러발생!!");
+            console.log(err);
+        }
+        res.send(result);
     })
 })
 // 1-5. store - prouct 삭제
