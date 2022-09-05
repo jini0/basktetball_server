@@ -161,6 +161,7 @@ app.get('/total/:idid', async (req,res)=>{
 app.put('/addCart', async (req,res)=>{
     const body = req.body;
     const { c_userid, c_name, c_span, c_saleprice, c_amount, c_img, c_select } = body;
+    console.log(c_name)
     const total = Number(c_amount) * Number(c_saleprice);
     connection.query(
         `select * from cart where userid='${c_userid}' and name='${c_name}'`,
@@ -169,10 +170,11 @@ app.put('/addCart', async (req,res)=>{
                 res.send('있음');
             } else {
                 connection.query(
-                    "insert into cart(userid, name, span, saleprice, amount, imgsrc, select) values(?,?,?,?,?,?,?)",
+                    "insert into cart(userid, name, span, saleprice, amount, imgsrc, select_option) values(?,?,?,?,?,?,?)",
                     [c_userid, c_name, c_span, c_saleprice, c_amount, c_img, c_select],
                     (err, rows, fields)=>{
                         res.send(rows);
+                        console.log(err);
                     }
                 )
             }
