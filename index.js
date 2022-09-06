@@ -130,7 +130,7 @@ app.get('/getId/:id', async (req,res)=>{
 })
 
 // <장바구니>
-// 장바구니
+// 1. 장바구니
 app.get('/cart/:idid', async (req, res)=>{
     const params = req.params;
     const { idid } = params;
@@ -144,7 +144,7 @@ app.get('/cart/:idid', async (req, res)=>{
     )
 })
 
-// 장바구니 총 금액 구하기
+// 1-1. 장바구니 총 금액 구하기
 app.get('/total/:idid', async (req,res)=>{
     const params = req.params;
     const { idid } = params;
@@ -156,8 +156,7 @@ app.get('/total/:idid', async (req,res)=>{
     )
 })
 
-
-// 장바구니에 추가
+// 1-2. 장바구니에 추가
 app.put('/addCart', async (req,res)=>{
     const body = req.body;
     const { c_userid, c_name, c_span, c_saleprice, c_amount, c_img, c_select } = body;
@@ -182,8 +181,7 @@ app.put('/addCart', async (req,res)=>{
     )
 })
 
-
-// 장바구니 삭제
+// 1-3. 장바구니 삭제
 app.delete('/delCart/:id', async (req,res)=>{
     const params = req.params;
     const { id } = params;
@@ -229,7 +227,7 @@ app.get('/getheart/:userid', async (req, res)=>{
 // })
 
 // <상품리뷰>
-// 리뷰 뿌리기 (제품 상세페이지에서 해당 제품의 리뷰들을 출력하기)
+// 1. 리뷰 뿌리기 (제품 상세페이지에서 해당 제품의 리뷰들을 출력하기)
 app.get("/review/:product", async (req,res)=>{
     // const params = req.params;
     const {product} = req.params;
@@ -241,7 +239,7 @@ app.get("/review/:product", async (req,res)=>{
     })
 })
 
-// 리뷰 작성하기
+// 1-2. 리뷰 작성하기
 app.post('/addReview', async (req, res)=>{
     const { userid, name, reviewtitle, reviewdesc, reviewimg, reviewstar, date } = req.body;
     console.log(req.body);
@@ -256,6 +254,42 @@ app.post('/addReview', async (req, res)=>{
         )
 })
 
+// 1-3. 리뷰 수정
+app.put('/editReview/:id', async (req, res)=>{
+    const params = req.params;
+    const { userid, name, reviewtitle, reviewdesc, reviewimg, reviewstar, date } = req.body;
+    console.log(req.body)
+    connection.query(`UPDATE review SET userid='${userid}', name='${name}', reviewtitle='${reviewtitle}', reviewdesc='${reviewdesc}', revieimg='${reviewimg}', reviewstar='${reviewstar}', date='${date}' where id=${params.id}`,
+    (err, result, fields)=>{
+        if(err) {
+            console.log("에러발생!!");
+            console.log(err);
+        }
+        res.send(result);
+    })
+})
+
+// 1-4. 리뷰 삭제 ( id로 확인 )
+// app.post("/delReview/:id", async (req,res)=>{
+//     const params = req.params
+//     const { id } = params
+//     connection.query(
+//         `DELETE FROM review where id = '${id}'`,
+//         (err,rows,fields)=>{         
+//               res.send(rows); 
+//         }
+//     )
+// })
+app.delete("/delReview/:id", async (req,res)=>{
+    const params = req.params
+    const { id } = params
+    connection.query(
+        `DELETE FROM review where id = '${id}'`,
+        (err,rows,fields)=>{         
+              res.send(rows); 
+        }
+    )
+})
 
 // <main페이지>
 // 1. notice 공지사항 - main 3개만 뿌리기
