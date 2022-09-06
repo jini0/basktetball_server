@@ -245,7 +245,6 @@ app.get("/review/:product", async (req,res)=>{
 app.post('/addReview', async (req, res)=>{
     const { userid, name, reviewtitle, reviewdesc, reviewimg, reviewstar, date } = req.body;
     console.log(req.body);
-    connection.query(
         connection.query(
             "insert into review(`userid`,`name`,`reviewtitle`,`reviewdesc`,`reviewimg`,`reviewstar`,`date`) values(?,?,?,?,?,?,?)",
             [userid, name, reviewtitle, reviewdesc, reviewimg, reviewstar, date],
@@ -255,7 +254,6 @@ app.post('/addReview', async (req, res)=>{
                 console.log(err);
             }
         )
-    )
 })
 
 
